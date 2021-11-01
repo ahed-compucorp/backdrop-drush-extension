@@ -11,8 +11,8 @@ function backdrop_site_install_drush_command() {
   $items['backdrop-site-install'] = array(
     'description' => dt('Install Backdrop along with modules/themes/configuration using the specified install profile.'),
     'arguments' => array(
-      'arguments' => dt('The install profile you wish to run. Default is "standard"'),
-      'key=value' => array(
+      'profile' => dt('The install profile you wish to run. Default is "standard"'),
+      'key=value...' => array(
         'description' => dt('Any additional settings you wish to pass to the profile. The key is in the form [form name].[parameter name]'),
         'multiple' => TRUE,
       ),
@@ -71,13 +71,33 @@ function backdrop_site_install_drush_callback($arguments = 'standard', $options 
     'database' => drush_get_option('database', ''),
   );
 
+  $args = func_get_args();
   $additional_form_options = array();
-  if (isset($arguments['key=value']) && !empty($arguments['key=value'])) {
-    foreach ($arguments['key=value'] as $argument) {
-      list($key, $value) = explode('=', $argument);
+
+  if ($args) {
+    // The first argument is the profile.
+    array_shift($args);
+    // The second argument is the options.
+    array_shift($args);
+    // Subsequent arguments are additional form values.
+    foreach ($args as $arg) {
+      list($key, $value) = explode('=', $arg, 2);
+
+      // Allow for numeric and NULL values to be passed in.
+      if (is_numeric($value)) {
+        $value = intval($value);
+      }
+      elseif ($value == 'NULL') {
+        $value = NULL;
+      }
+
       $additional_form_options[$key] = $value;
     }
   }
+
+
+  var_dump($additional_form_options);
+  die();
 
   $profile = 'standard';
   if (isset($arguments)) {
