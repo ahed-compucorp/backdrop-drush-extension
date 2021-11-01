@@ -96,9 +96,6 @@ function backdrop_site_install_drush_callback($arguments = 'standard', $options 
   }
 
 
-  var_dump($additional_form_options);
-  die();
-
   $profile = 'standard';
   if (isset($arguments)) {
     $profile = $arguments;
